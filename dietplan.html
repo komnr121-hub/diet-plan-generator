@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            background: linear-gradient(to right, #000000, #333333);
+            color: #d4bf52;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #f5e9b8;
+            font-size: 1rem;
+        }
+        
+        .form-container {
+            padding: 20px;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            color: #2E7D32;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .height-tabs {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .height-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .height-tab.active {
+            background: white;
+        }
+        
+        .height-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-reset {
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #dee2e6;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(to right, #d4af37, #b8941f);
+            color: white;
+        }
+        
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .bmi-display {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            color: #2E7D32;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-utensils"></i> Diet Plan Generator</h1>
+            <p>Create personalized diet plans for clients</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-user"></i> Client Information</h2>
+                
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="clientName" required placeholder="Enter client name" value="Alex Johnson">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="clientEmail" placeholder="client@example.com" value="alex@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="clientAge" min="1" max="120" value="32">
+                </div>
+                
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="clientGender">
+                        <option value="male">Male</option>
+                        <option value="female" selected>Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="clientWeight" min="1" max="300" value="68">
+                </div>
+                
+                <div class="form-group">
+                    <label>Height <span class="bmi-display" id="bmiValue">BMI: 25.0</span></label>
+                    
+                    <div class="height-tabs">
+                        <button type="button" class="height-tab active" data-unit="cm">CM</button>
+                        <button type="button" class="height-tab" data-unit="ft">Feet/Inches</button>
+                    </div>
+                    
+                    <div id="heightCmGroup">
+                        <input type="number" id="heightCm" min="50" max="250" value="165" placeholder="Height in cm">
+                    </div>
+                    
+                    <div id="heightFtGroup" style="display: none;">
+                        <div class="height-inputs">
+                            <input type="number" id="heightFt" min="3" max="8" value="5" placeholder="Feet">
+                            <input type="number" id="heightIn" min="0" max="11" value="5" placeholder="Inches">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diet Goals -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-bullseye"></i> Diet Goals</h2>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal1" checked>
+                        <label for="goal1">Weight Loss</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal2">
+                        <label for="goal2">Muscle Gain</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal3">
+                        <label for="goal3">Maintenance</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal4" checked>
+                        <label for="goal4">Improve Health</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Diet Type</label>
+                    <select id="dietType">
+                        <option value="balanced">Balanced</option>
+                        <option value="vegetarian" selected>Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="keto">Keto</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Activity Level</label>
+                    <select id="activityLevel">
+                        <option value="sedentary">Sedentary</option>
+                        <option value="light">Lightly Active</option>
+                        <option value="moderate" selected>Moderately Active</option>
+                        <option value="active">Active</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Allergies & Restrictions</label>
+                    <textarea id="allergies">Lactose intolerance, mild nut allergy</textarea>
+                </div>
+            </div>
+            
+            <!-- Meal Plan -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-apple-alt"></i> Daily Meal Plan</h2>
+                
+                <div class="form-group">
+                    <label>Breakfast</label>
+                    <textarea id="breakfast">Oatmeal with berries and almonds, Greek yogurt, Green tea</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Morning Snack</label>
+                    <textarea id="morningSnack">Apple with 2 tbsp peanut butter</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Lunch</label>
+                    <textarea id="lunch">Grilled chicken salad with mixed greens, avocado, quinoa, and lemon vinaigrette</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Dinner</label>
+                    <textarea id="dinner">Baked salmon with roasted vegetables (broccoli, bell peppers, sweet potatoes)</textarea>
+                </div>
+            </div>
+            
+            <!-- Notes -->
+            <div class="form-section">
+                <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Instructions & Notes</h2>
+                
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="notes">• Drink at least 8 glasses of water daily
+• Limit processed foods and added sugars
+• Try to finish dinner by 7 PM
+• Take multivitamin with breakfast</textarea>
+                </div>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="buttons">
+                <button type="button" class="btn btn-reset" id="resetBtn">
+                    <i class="fas fa-redo"></i> Clear Form
+                </button>
+                <button type="button" class="btn btn-generate" id="generateBtn">
+                    <i class="fas fa-file-pdf"></i> Generate PDF
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Need help? Contact us on WhatsApp:</p>
+            <a href="https://wa.me/03357214448" class="whatsapp-link" target="_blank">
+                <i class="fab fa-whatsapp"></i> 03357214448
+            </a>
+            <p style="margin-top: 15px; font-size: 0.8rem;">
+                Tip: Add to Home Screen for app-like experience
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Height tabs functionality
+        const heightTabs = document.querySelectorAll('.height-tab');
+        const heightCmGroup = document.getElementById('heightCmGroup');
+        const heightFtGroup = document.getElementById('heightFtGroup');
+        
+        heightTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                heightTabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show correct input group
+                if (this.dataset.unit === 'cm') {
+                    heightCmGroup.style.display = 'block';
+                    heightFtGroup.style.display = 'none';
+                } else {
+                    heightCmGroup.style.display = 'none';
+                    heightFtGroup.style.display = 'block';
+                }
+                
+                // Recalculate BMI
+                calculateBMI();
+            });
+        });
+        
+        // BMI Calculation
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('clientWeight').value);
+            let heightCm;
+            
+            const activeTab = document.querySelector('.height-tab.active');
+            if (activeTab.dataset.unit === 'cm') {
+                heightCm = parseFloat(document.getElementById('heightCm').value);
+            } else {
+                const feet = parseFloat(document.getElementById('heightFt').value) || 0;
+                const inches = parseFloat(document.getElementById('heightIn').value) || 0;
+                heightCm = (feet * 30.48) + (inches * 2.54);
+            }
+            
+            if (weight && heightCm && heightCm > 0) {
+                const heightInMeters = heightCm / 100;
+                const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
+                
+                // Update BMI display
+                document.getElementById('bmiValue').textContent = `BMI: ${bmi}`;
+                
+                // Color code based on BMI
+                const bmiDisplay = document.getElementById('bmiValue');
+                if (bmi < 18.5) {
+                    bmiDisplay.style.backgroundColor = '#fff3e0';
+                    bmiDisplay.style.color = '#ef6c00';
+                } else if (bmi >= 18.5 && bmi <= 24.9) {
+                    bmiDisplay.style.backgroundColor = '#e8f5e9';
+                    bmiDisplay.style.color = '#2E7D32';
+                } else {
+                    bmiDisplay.style.backgroundColor = '#ffebee';
+                    bmiDisplay.style.color = '#c62828';
+                }
+            }
+        }
+        
+        // Initialize BMI calculation
+        document.getElementById('clientWeight').addEventListener('input', calculateBMI);
+        document.getElementById('heightCm').addEventListener('input', calculateBMI);
+        document.getElementById('heightFt').addEventListener('input', calculateBMI);
+        document.getElementById('heightIn').addEventListener('input', calculateBMI);
+        
+        // Reset form
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (confirm('Clear all form data?')) {
+                document.getElementById('clientName').value = '';
+                document.getElementById('clientEmail').value = '';
+                document.getElementById('clientAge').value = '';
+                document.getElementById('clientWeight').value = '';
+                document.getElementById('heightCm').value = '';
+                document.getElementById('heightFt').value = '5';
+                document.getElementById('heightIn').value = '5';
+                document.getElementById('allergies').value = '';
+                document.getElementById('breakfast').value = '';
+                document.getElementById('morningSnack').value = '';
+                document.getElementById('lunch').value = '';
+                document.getElementById('dinner').value = '';
+                document.getElementById('notes').value = '';
+                
+                // Reset checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                document.getElementById('goal1').checked = true;
+                document.getElementById('goal4').checked = true;
+                
+                alert('Form cleared!');
+            }
+        });
+        
+        // Generate PDF
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const clientName = document.getElementById('clientName').value;
+            
+            if (!clientName) {
+                alert('Please enter client name');
+                document.getElementById('clientName').focus();
+                return;
+            }
+            
+            // Show loading
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            this.disabled = true;
+            
+            // Get form values
+            const formData = {
+                name: clientName,
+                email: document.getElementById('clientEmail').value,
+                age: document.getElementById('clientAge').value,
+                gender: document.getElementById('clientGender').value,
+                weight: document.getElementById('clientWeight').value,
+                height: document.querySelector('.height-tab.active').dataset.unit === 'cm' 
+                    ? document.getElementById('heightCm').value + ' cm'
+                    : document.getElementById('heightFt').value + "'" + document.getElementById('heightIn').value + '"',
+                dietType: document.getElementById('dietType').value,
+                activity: document.getElementById('activityLevel').value,
+                allergies: document.getElementById('allergies').value,
+                breakfast: document.getElementById('breakfast').value,
+                morningSnack: document.getElementById('morningSnack').value,
+                lunch: document.getElementById('lunch').value,
+                dinner: document.getElementById('dinner').value,
+                notes: document.getElementById('notes').value,
+                goals: []
+            };
+            
+            // Get selected goals
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                formData.goals.push(cb.nextElementSibling.textContent);
+            });
+            
+            // Generate PDF
+            generatePDF(formData);
+            
+            // Restore button
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            }, 2000);
+        });
+        
+        function generatePDF(data) {
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            let yPos = 20;
+            
+            // Header with black background and golden text
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(212, 191, 82); // Gold color
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PERSONALIZED DIET PLAN', 105, 20, { align: 'center' });
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Generated for ${data.name}`, 105, 30, { align: 'center' });
+            
+            yPos = 50;
+            
+            // Client Information
+            doc.setTextColor(46, 125, 50); // Green
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('CLIENT INFORMATION', 15, yPos);
+            
+            yPos += 10;
+            doc.setDrawColor(46, 125, 50);
+            doc.line(15, yPos, 195, yPos);
+            
+            yPos += 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text(`Name: ${data.name}`, 20, yPos);
+            doc.text(`Email: ${data.email || 'Not provided'}`, 110, yPos);
+            yPos += 7;
+            
+            doc.text(`Age: ${data.age || 'Not provided'}`, 20, yPos);
+            doc.text(`Gender: ${data.gender}`, 110, yPos);
+            yPos += 7;
+            
+            doc.text(`Weight: ${data.weight} kg`, 20, yPos);
+            doc.text(`Height: ${data.height}`, 110, yPos);
+            yPos += 15;
+            
+            // Diet Goals
+            doc.setTextColor(46, 125, 50);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DIET GOALS & PREFERENCES', 15, yPos);
+            
+            yPos += 10;
+            doc.setDrawColor(46, 125, 50);
+            doc.line(15, yPos, 195, yPos);
+            
+            yPos += 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            
+            if (data.goals.length > 0) {
+                doc.text('Goals:', 20, yPos);
+                data.goals.forEach((goal, index) => {
+                    doc.text(`• ${goal}`, 30, yPos + (index * 6));
+                });
+                yPos += (data.goals.length * 6) + 10;
+            }
+            
+            doc.text(`Diet Type: ${data.dietType}`, 20, yPos);
+            doc.text(`Activity Level: ${data.activity}`, 110, yPos);
+            yPos += 10;
+            
+            if (data.allergies) {
+                doc.text(`Allergies: ${data.allergies}`, 20, yPos);
+                yPos += 10;
+            }
+            
+            yPos += 5;
+            
+            // Meal Plan
+            doc.setTextColor(46, 125, 50);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DAILY MEAL PLAN', 15, yPos);
+            
+            yPos += 10;
+            doc.setDrawColor(46, 125, 50);
+            doc.line(15, yPos, 195, yPos);
+            
+            yPos += 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            
+            const meals = [
+                { title: 'BREAKFAST', content: data.breakfast, color: [232, 245, 233] },
+                { title: 'MORNING SNACK', content: data.morningSnack, color: [241, 248, 233] },
+                { title: 'LUNCH', content: data.lunch, color: [255, 243, 224] },
+                { title: 'DINNER', content: data.dinner, color: [243, 229, 245] }
+            ];
+            
+            meals.forEach(meal => {
+                // Check if we need new page
+                if (yPos > 250) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                // Meal header with color
+                doc.setFillColor(...meal.color);
+                doc.rect(20, yPos - 4, 170, 8, 'F');
+                
+                doc.setTextColor(46, 125, 50);
+                doc.setFont('helvetica', 'bold');
+                doc.text(meal.title, 25, yPos);
+                
+                yPos += 10;
+                
+                // Meal content
+                doc.setTextColor(0, 0, 0);
+                doc.setFont('helvetica', 'normal');
+                
+                const lines = doc.splitTextToSize(meal.content, 160);
+                doc.text(lines, 25, yPos);
+                yPos += (lines.length * 6) + 10;
+            });
+            
+            // Notes
+            if (yPos > 220) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            doc.setTextColor(46, 125, 50);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ADDITIONAL NOTES', 15, yPos);
+            
+            yPos += 10;
+            doc.setDrawColor(46, 125, 50);
+            doc.line(15, yPos, 195, yPos);
+            
+            yPos += 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            
+            const notesLines = doc.splitTextToSize(data.notes, 170);
+            doc.text(notesLines, 20, yPos);
+            
+            // Footer with WhatsApp contact
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            doc.setTextColor(100, 100, 100);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'italic');
+            doc.text(`Generated on ${currentDate} • Contact us on WhatsApp: 03357214448`, 105, 280, { align: 'center' });
+            
+            // Save PDF
+            const fileName = `diet-plan-${data.name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+            doc.save(fileName);
+            
+            alert('PDF generated successfully! Check your downloads.');
+        }
+        
+        // Initialize BMI on load
+        calculateBMI();
+    </script>
+</body>
+</html>
