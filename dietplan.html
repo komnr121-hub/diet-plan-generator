@@ -93,7 +93,7 @@
         }
         
         textarea {
-            min-height: 100px;
+            min-height: 80px;
             resize: vertical;
         }
         
@@ -139,6 +139,44 @@
         
         .checkbox-item input {
             width: auto;
+        }
+        
+        .meal-variations {
+            background: #f1f8e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .add-meal-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .meal-option {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0f2e0;
+        }
+        
+        .remove-meal {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
         }
         
         .buttons {
@@ -196,14 +234,31 @@
         .bmi-display {
             display: inline-block;
             padding: 3px 8px;
-            background: #e8f5e9;
             border-radius: 5px;
-            color: #2E7D32;
             font-weight: 600;
             margin-left: 10px;
         }
         
-        /* Mobile optimizations */
+        .bmi-underweight {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .bmi-normal {
+            background: #e8f5e9;
+            color: #2E7D32;
+        }
+        
+        .bmi-overweight {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .bmi-obese {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
         @media (max-width: 480px) {
             .buttons {
                 flex-direction: column;
@@ -211,10 +266,6 @@
             
             .header h1 {
                 font-size: 1.5rem;
-            }
-            
-            .form-container {
-                padding: 15px;
             }
         }
     </style>
@@ -261,7 +312,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Height <span class="bmi-display" id="bmiValue">BMI: 25.0</span></label>
+                    <label>Height <span class="bmi-display" id="bmiValue">BMI: --</span></label>
                     
                     <div class="height-tabs">
                         <button type="button" class="height-tab active" data-unit="cm">CM</button>
@@ -302,6 +353,14 @@
                         <input type="checkbox" id="goal4" checked>
                         <label for="goal4">Improve Health</label>
                     </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal5">
+                        <label for="goal5">Increase Energy</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal6">
+                        <label for="goal6">Reduce Cholesterol</label>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -311,16 +370,22 @@
                         <option value="vegetarian" selected>Vegetarian</option>
                         <option value="vegan">Vegan</option>
                         <option value="keto">Keto</option>
+                        <option value="lowCarb">Low Carb</option>
+                        <option value="mediterranean">Mediterranean</option>
+                        <option value="paleo">Paleo</option>
+                        <option value="glutenFree">Gluten Free</option>
+                        <option value="dairyFree">Dairy Free</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label>Activity Level</label>
                     <select id="activityLevel">
-                        <option value="sedentary">Sedentary</option>
-                        <option value="light">Lightly Active</option>
-                        <option value="moderate" selected>Moderately Active</option>
-                        <option value="active">Active</option>
+                        <option value="sedentary">Sedentary (office job, little exercise)</option>
+                        <option value="light">Lightly Active (light exercise 1-3 days/week)</option>
+                        <option value="moderate" selected>Moderately Active (moderate exercise 3-5 days/week)</option>
+                        <option value="active">Active (daily exercise or physical job)</option>
+                        <option value="veryActive">Very Active (intense daily exercise or athletic training)</option>
                     </select>
                 </div>
                 
@@ -330,28 +395,76 @@
                 </div>
             </div>
             
-            <!-- Meal Plan -->
+            <!-- Meal Plan with Variations -->
             <div class="form-section">
-                <h2 class="section-title"><i class="fas fa-apple-alt"></i> Daily Meal Plan</h2>
+                <h2 class="section-title"><i class="fas fa-apple-alt"></i> Meal Plan & Variations</h2>
+                <p style="margin-bottom: 15px; color: #666; font-size: 0.9rem;">Add multiple meal options for each time slot</p>
                 
-                <div class="form-group">
-                    <label>Breakfast</label>
-                    <textarea id="breakfast">Oatmeal with berries and almonds, Greek yogurt, Green tea</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Morning Snack</label>
-                    <textarea id="morningSnack">Apple with 2 tbsp peanut butter</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Lunch</label>
-                    <textarea id="lunch">Grilled chicken salad with mixed greens, avocado, quinoa, and lemon vinaigrette</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Dinner</label>
-                    <textarea id="dinner">Baked salmon with roasted vegetables (broccoli, bell peppers, sweet potatoes)</textarea>
+                <div class="meal-variations">
+                    <!-- Standard Meal Times -->
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Breakfast Option 1</label>
+                        <textarea class="meal-text" placeholder="Describe breakfast meal...">Oatmeal with berries and almonds, Greek yogurt, Green tea</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Breakfast Option 2</label>
+                        <textarea class="meal-text" placeholder="Alternate breakfast option...">Scrambled eggs with spinach, whole wheat toast, fresh orange juice</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Mid-Morning Snack</label>
+                        <textarea class="meal-text" placeholder="Describe snack...">Apple with 2 tbsp peanut butter, or a handful of almonds</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Lunch Option 1</label>
+                        <textarea class="meal-text" placeholder="Describe lunch meal...">Grilled chicken salad with mixed greens, avocado, quinoa, and lemon vinaigrette</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Lunch Option 2</label>
+                        <textarea class="meal-text" placeholder="Alternate lunch option...">Vegetable stir-fry with tofu and brown rice, miso soup</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Afternoon Snack</label>
+                        <textarea class="meal-text" placeholder="Describe snack...">Carrot and celery sticks with hummus, or Greek yogurt with honey</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Dinner Option 1</label>
+                        <textarea class="meal-text" placeholder="Describe dinner meal...">Baked salmon with roasted vegetables (broccoli, bell peppers, sweet potatoes)</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Dinner Option 2</label>
+                        <textarea class="meal-text" placeholder="Alternate dinner option...">Lentil curry with cauliflower rice, side salad</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Evening Snack (Optional)</label>
+                        <textarea class="meal-text" placeholder="Optional snack...">A small handful of walnuts or a cup of herbal tea</textarea>
+                    </div>
+                    
+                    <div class="meal-option">
+                        <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                        <label>Pre/Post Workout Meal</label>
+                        <textarea class="meal-text" placeholder="Workout nutrition...">Banana with protein shake, or rice cakes with almond butter</textarea>
+                    </div>
+                    
+                    <button type="button" class="add-meal-btn" onclick="addMealOption()">
+                        <i class="fas fa-plus"></i> Add More Meal Option
+                    </button>
                 </div>
             </div>
             
@@ -360,11 +473,27 @@
                 <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Instructions & Notes</h2>
                 
                 <div class="form-group">
-                    <label>Additional Notes</label>
-                    <textarea id="notes">• Drink at least 8 glasses of water daily
+                    <label>General Guidelines</label>
+                    <textarea id="generalNotes">• Drink at least 8-10 glasses of water daily
 • Limit processed foods and added sugars
 • Try to finish dinner by 7 PM
-• Take multivitamin with breakfast</textarea>
+• Take multivitamin with breakfast
+• Include protein in every meal
+• Practice mindful eating
+• Get 7-8 hours of sleep nightly</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Supplement Recommendations</label>
+                    <textarea id="supplements">Multivitamin, Vitamin D3, Omega-3 Fish Oil, Probiotics</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Weekly Check-in Notes</label>
+                    <textarea id="weeklyNotes">Track weight every Monday morning
+Measure progress photos every 2 weeks
+Adjust calories based on weekly results
+Schedule follow-up consultation in 2 weeks</textarea>
                 </div>
             </div>
             
@@ -385,7 +514,7 @@
                 <i class="fab fa-whatsapp"></i> 03357214448
             </a>
             <p style="margin-top: 15px; font-size: 0.8rem;">
-                Tip: Add to Home Screen for app-like experience
+                Add to Home Screen for app-like experience
             </p>
         </div>
     </div>
@@ -401,12 +530,9 @@
         
         heightTabs.forEach(tab => {
             tab.addEventListener('click', function() {
-                // Remove active class from all tabs
                 heightTabs.forEach(t => t.classList.remove('active'));
-                // Add active class to clicked tab
                 this.classList.add('active');
                 
-                // Show correct input group
                 if (this.dataset.unit === 'cm') {
                     heightCmGroup.style.display = 'block';
                     heightFtGroup.style.display = 'none';
@@ -415,12 +541,11 @@
                     heightFtGroup.style.display = 'block';
                 }
                 
-                // Recalculate BMI
                 calculateBMI();
             });
         });
         
-        // BMI Calculation
+        // BMI Calculation with proper categories
         function calculateBMI() {
             const weight = parseFloat(document.getElementById('clientWeight').value);
             let heightCm;
@@ -438,22 +563,33 @@
                 const heightInMeters = heightCm / 100;
                 const bmi = (weight / (heightInMeters * heightInMeters)).toFixed(1);
                 
-                // Update BMI display
-                document.getElementById('bmiValue').textContent = `BMI: ${bmi}`;
+                // Determine BMI category
+                let bmiCategory = '';
+                let bmiClass = '';
                 
-                // Color code based on BMI
-                const bmiDisplay = document.getElementById('bmiValue');
                 if (bmi < 18.5) {
-                    bmiDisplay.style.backgroundColor = '#fff3e0';
-                    bmiDisplay.style.color = '#ef6c00';
+                    bmiCategory = 'Underweight';
+                    bmiClass = 'bmi-underweight';
                 } else if (bmi >= 18.5 && bmi <= 24.9) {
-                    bmiDisplay.style.backgroundColor = '#e8f5e9';
-                    bmiDisplay.style.color = '#2E7D32';
+                    bmiCategory = 'Normal';
+                    bmiClass = 'bmi-normal';
+                } else if (bmi >= 25 && bmi <= 29.9) {
+                    bmiCategory = 'Overweight';
+                    bmiClass = 'bmi-overweight';
                 } else {
-                    bmiDisplay.style.backgroundColor = '#ffebee';
-                    bmiDisplay.style.color = '#c62828';
+                    bmiCategory = 'Obese';
+                    bmiClass = 'bmi-obese';
                 }
+                
+                // Update BMI display
+                const bmiElement = document.getElementById('bmiValue');
+                bmiElement.textContent = `BMI: ${bmi} (${bmiCategory})`;
+                bmiElement.className = 'bmi-display ' + bmiClass;
+                
+                return { bmi, category: bmiCategory };
             }
+            
+            return null;
         }
         
         // Initialize BMI calculation
@@ -461,6 +597,29 @@
         document.getElementById('heightCm').addEventListener('input', calculateBMI);
         document.getElementById('heightFt').addEventListener('input', calculateBMI);
         document.getElementById('heightIn').addEventListener('input', calculateBMI);
+        
+        // Meal variations management
+        function addMealOption() {
+            const mealVariations = document.querySelector('.meal-variations');
+            const newMeal = document.createElement('div');
+            newMeal.className = 'meal-option';
+            newMeal.innerHTML = `
+                <button type="button" class="remove-meal" onclick="removeMeal(this)">×</button>
+                <label>Additional Meal Option</label>
+                <textarea class="meal-text" placeholder="Describe this meal option..."></textarea>
+            `;
+            
+            // Insert before the "Add More Meal Option" button
+            const addButton = document.querySelector('.add-meal-btn');
+            mealVariations.insertBefore(newMeal, addButton);
+        }
+        
+        function removeMeal(button) {
+            const mealOption = button.closest('.meal-option');
+            if (mealOption && document.querySelectorAll('.meal-option').length > 1) {
+                mealOption.remove();
+            }
+        }
         
         // Reset form
         document.getElementById('resetBtn').addEventListener('click', function() {
@@ -473,18 +632,34 @@
                 document.getElementById('heightFt').value = '5';
                 document.getElementById('heightIn').value = '5';
                 document.getElementById('allergies').value = '';
-                document.getElementById('breakfast').value = '';
-                document.getElementById('morningSnack').value = '';
-                document.getElementById('lunch').value = '';
-                document.getElementById('dinner').value = '';
-                document.getElementById('notes').value = '';
+                document.getElementById('generalNotes').value = '';
+                document.getElementById('supplements').value = '';
+                document.getElementById('weeklyNotes').value = '';
+                
+                // Reset meal options to default
+                const mealTexts = document.querySelectorAll('.meal-text');
+                mealTexts.forEach((text, index) => {
+                    if (index === 0) text.value = 'Oatmeal with berries and almonds, Greek yogurt, Green tea';
+                    else if (index === 1) text.value = 'Scrambled eggs with spinach, whole wheat toast, fresh orange juice';
+                    else if (index === 2) text.value = 'Apple with 2 tbsp peanut butter, or a handful of almonds';
+                    else if (index === 3) text.value = 'Grilled chicken salad with mixed greens, avocado, quinoa, and lemon vinaigrette';
+                    else if (index === 4) text.value = 'Vegetable stir-fry with tofu and brown rice, miso soup';
+                    else if (index === 5) text.value = 'Carrot and celery sticks with hummus, or Greek yogurt with honey';
+                    else if (index === 6) text.value = 'Baked salmon with roasted vegetables (broccoli, bell peppers, sweet potatoes)';
+                    else if (index === 7) text.value = 'Lentil curry with cauliflower rice, side salad';
+                    else if (index === 8) text.value = 'A small handful of walnuts or a cup of herbal tea';
+                    else if (index === 9) text.value = 'Banana with protein shake, or rice cakes with almond butter';
+                    else text.value = '';
+                });
                 
                 // Reset checkboxes
-                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                    cb.checked = false;
-                });
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 document.getElementById('goal1').checked = true;
                 document.getElementById('goal4').checked = true;
+                
+                // Reset BMI display
+                document.getElementById('bmiValue').textContent = 'BMI: --';
+                document.getElementById('bmiValue').className = 'bmi-display';
                 
                 alert('Form cleared!');
             }
@@ -518,18 +693,30 @@
                 dietType: document.getElementById('dietType').value,
                 activity: document.getElementById('activityLevel').value,
                 allergies: document.getElementById('allergies').value,
-                breakfast: document.getElementById('breakfast').value,
-                morningSnack: document.getElementById('morningSnack').value,
-                lunch: document.getElementById('lunch').value,
-                dinner: document.getElementById('dinner').value,
-                notes: document.getElementById('notes').value,
-                goals: []
+                generalNotes: document.getElementById('generalNotes').value,
+                supplements: document.getElementById('supplements').value,
+                weeklyNotes: document.getElementById('weeklyNotes').value,
+                goals: [],
+                meals: []
             };
             
             // Get selected goals
             document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
                 formData.goals.push(cb.nextElementSibling.textContent);
             });
+            
+            // Get all meal options
+            document.querySelectorAll('.meal-option').forEach(mealOption => {
+                const label = mealOption.querySelector('label').textContent;
+                const text = mealOption.querySelector('.meal-text').value;
+                if (text.trim()) {
+                    formData.meals.push({ label, text });
+                }
+            });
+            
+            // Calculate BMI for PDF
+            const bmiResult = calculateBMI();
+            formData.bmi = bmiResult ? `${bmiResult.bmi} (${bmiResult.category})` : 'N/A';
             
             // Generate PDF
             generatePDF(formData);
@@ -562,11 +749,11 @@
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(12);
             doc.setFont('helvetica', 'normal');
-            doc.text(`Generated for ${data.name}`, 105, 30, { align: 'center' });
+            doc.text(`Created for ${data.name}`, 105, 30, { align: 'center' });
             
             yPos = 50;
             
-            // Client Information
+            // Client Information with BMI
             doc.setTextColor(46, 125, 50); // Green
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
@@ -591,9 +778,30 @@
             
             doc.text(`Weight: ${data.weight} kg`, 20, yPos);
             doc.text(`Height: ${data.height}`, 110, yPos);
+            yPos += 7;
+            
+            // Add BMI with color coding
+            if (data.bmi !== 'N/A') {
+                const bmiMatch = data.bmi.match(/(\d+\.?\d*)\s*\((.*?)\)/);
+                if (bmiMatch) {
+                    const bmiValue = bmiMatch[1];
+                    const bmiCategory = bmiMatch[2];
+                    
+                    let bmiColor;
+                    if (bmiCategory === 'Underweight') bmiColor = [239, 108, 0];
+                    else if (bmiCategory === 'Normal') bmiColor = [46, 125, 50];
+                    else if (bmiCategory === 'Overweight') bmiColor = [245, 124, 0];
+                    else bmiColor = [198, 40, 40];
+                    
+                    doc.setTextColor(...bmiColor);
+                    doc.text(`BMI: ${bmiValue} (${bmiCategory})`, 20, yPos);
+                    doc.setTextColor(0, 0, 0);
+                }
+            }
+            
             yPos += 15;
             
-            // Diet Goals
+            // Diet Goals & Preferences
             doc.setTextColor(46, 125, 50);
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
@@ -611,7 +819,7 @@
             if (data.goals.length > 0) {
                 doc.text('Goals:', 20, yPos);
                 data.goals.forEach((goal, index) => {
-                    doc.text(`• ${goal}`, 30, yPos + (index * 6));
+                    doc.text(`✓ ${goal}`, 30, yPos + (index * 6));
                 });
                 yPos += (data.goals.length * 6) + 10;
             }
@@ -625,13 +833,17 @@
                 yPos += 10;
             }
             
-            yPos += 5;
+            // Check if we need new page
+            if (yPos > 240) {
+                doc.addPage();
+                yPos = 20;
+            }
             
-            // Meal Plan
+            // Meal Plan with Variations
             doc.setTextColor(46, 125, 50);
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
-            doc.text('DAILY MEAL PLAN', 15, yPos);
+            doc.text('COMPLETE MEAL PLAN & VARIATIONS', 15, yPos);
             
             yPos += 10;
             doc.setDrawColor(46, 125, 50);
@@ -641,14 +853,8 @@
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(11);
             
-            const meals = [
-                { title: 'BREAKFAST', content: data.breakfast, color: [232, 245, 233] },
-                { title: 'MORNING SNACK', content: data.morningSnack, color: [241, 248, 233] },
-                { title: 'LUNCH', content: data.lunch, color: [255, 243, 224] },
-                { title: 'DINNER', content: data.dinner, color: [243, 229, 245] }
-            ];
-            
-            meals.forEach(meal => {
+            // Add all meal options
+            data.meals.forEach((meal, index) => {
                 // Check if we need new page
                 if (yPos > 250) {
                     doc.addPage();
@@ -656,12 +862,22 @@
                 }
                 
                 // Meal header with color
-                doc.setFillColor(...meal.color);
+                const colors = [
+                    [232, 245, 233], // Light green
+                    [241, 248, 233], // Light yellow-green
+                    [255, 243, 224], // Light orange
+                    [243, 229, 245], // Light purple
+                    [232, 234, 246], // Light blue
+                    [255, 224, 178]  // Light peach
+                ];
+                const colorIndex = index % colors.length;
+                
+                doc.setFillColor(...colors[colorIndex]);
                 doc.rect(20, yPos - 4, 170, 8, 'F');
                 
                 doc.setTextColor(46, 125, 50);
                 doc.setFont('helvetica', 'bold');
-                doc.text(meal.title, 25, yPos);
+                doc.text(meal.label, 25, yPos);
                 
                 yPos += 10;
                 
@@ -669,21 +885,22 @@
                 doc.setTextColor(0, 0, 0);
                 doc.setFont('helvetica', 'normal');
                 
-                const lines = doc.splitTextToSize(meal.content, 160);
+                const lines = doc.splitTextToSize(meal.text, 160);
                 doc.text(lines, 25, yPos);
                 yPos += (lines.length * 6) + 10;
             });
             
-            // Notes
-            if (yPos > 220) {
+            // Check if we need new page for notes
+            if (yPos > 200) {
                 doc.addPage();
                 yPos = 20;
             }
             
+            // Additional Notes
             doc.setTextColor(46, 125, 50);
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
-            doc.text('ADDITIONAL NOTES', 15, yPos);
+            doc.text('ADDITIONAL GUIDELINES', 15, yPos);
             
             yPos += 10;
             doc.setDrawColor(46, 125, 50);
@@ -694,8 +911,33 @@
             doc.setFontSize(11);
             doc.setFont('helvetica', 'normal');
             
-            const notesLines = doc.splitTextToSize(data.notes, 170);
-            doc.text(notesLines, 20, yPos);
+            // General Notes
+            if (data.generalNotes) {
+                const notesLines = doc.splitTextToSize(data.generalNotes, 170);
+                doc.text(notesLines, 20, yPos);
+                yPos += (notesLines.length * 6) + 10;
+            }
+            
+            // Supplements
+            if (data.supplements) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Recommended Supplements:', 20, yPos);
+                yPos += 7;
+                doc.setFont('helvetica', 'normal');
+                const supplementLines = doc.splitTextToSize(data.supplements, 170);
+                doc.text(supplementLines, 20, yPos);
+                yPos += (supplementLines.length * 6) + 10;
+            }
+            
+            // Weekly Notes
+            if (data.weeklyNotes) {
+                doc.setFont('helvetica', 'bold');
+                doc.text('Weekly Check-in Instructions:', 20, yPos);
+                yPos += 7;
+                doc.setFont('helvetica', 'normal');
+                const weeklyLines = doc.splitTextToSize(data.weeklyNotes, 170);
+                doc.text(weeklyLines, 20, yPos);
+            }
             
             // Footer with WhatsApp contact
             const currentDate = new Date().toLocaleDateString('en-US', {
@@ -707,7 +949,7 @@
             doc.setTextColor(100, 100, 100);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'italic');
-            doc.text(`Generated on ${currentDate} • Contact us on WhatsApp: 03357214448`, 105, 280, { align: 'center' });
+            doc.text(`Generated on ${currentDate} • For questions, WhatsApp: 03357214448`, 105, 280, { align: 'center' });
             
             // Save PDF
             const fileName = `diet-plan-${data.name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
